@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// TODO: better
+// TODO: snazzier mock landing page
 export default function Home() {
   return (
     <>
