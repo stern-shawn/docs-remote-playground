@@ -1,25 +1,15 @@
 import { getAllPaths } from '@/util/getPaths';
 import { remarkCodeHike } from '@code-hike/mdx';
 import { CH } from '@code-hike/mdx/components';
-import {
-  Anchor,
-  Box,
-  Heading,
-  InlineCode,
-  ListItem,
-  OrderedList,
-  Paragraph,
-  Separator,
-  TBody,
-  TFoot,
-  THead,
-  Table,
-  Td,
-  Th,
-  Tr,
-  UnorderedList,
-  isExternalUrl,
-} from '@twilio-paste/core';
+import { Anchor, isExternalUrl } from '@twilio-paste/anchor';
+import { Box } from '@twilio-paste/box';
+import { Heading } from '@twilio-paste/heading';
+import { InlineCode } from '@twilio-paste/inline-code';
+import { ListItem, OrderedList, UnorderedList } from '@twilio-paste/list';
+import { Paragraph } from '@twilio-paste/paragraph';
+import { Separator } from '@twilio-paste/separator';
+import { TBody, TFoot, THead, Table, Td, Th, Tr } from '@twilio-paste/table';
+
 import { MDXComponents } from 'mdx/types';
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
