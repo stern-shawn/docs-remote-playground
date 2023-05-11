@@ -25,12 +25,19 @@ export default function TestPage({
 export const getStaticPaths: GetStaticPaths = async () => {
   const docsDirectory = path.resolve(process.cwd(), 'docs');
   const fsPaths = await getAllPaths(docsDirectory);
-  const paths = fsPaths.map((p) => {
-    return p
-      .replace(/\.mdx$/, '')
-      .replace(`${docsDirectory}/`, '')
-      .split('/');
-  });
+  const mdxRegEx = new RegExp(/\.mdx$/);
+  const paths = fsPaths.reduce<string[][]>((acc, currPath) => {
+    if (mdxRegEx.test(currPath)) {
+      acc.push(
+        currPath
+          .replace(mdxRegEx, '')
+          .replace(`${docsDirectory}/`, '')
+          .split('/')
+      );
+    }
+
+    return acc;
+  }, []);
 
   return {
     paths: paths.map((path) => ({
@@ -41,10 +48,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps<{
-  source: MDXRemoteSerializeResult<
-    Record<string, unknown>,
-    Record<string, unknown>
-  >;
+  source: MDXRemoteSerializeResult;
 }> = async (context) => {
   const requestedPath = context.params?.path;
   if (!requestedPath) return { notFound: true };
@@ -86,7 +90,9 @@ export const getStaticProps: GetStaticProps<{
 
   const mdxSource = await serialize(markdown, {
     mdxOptions: {
-      remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
+      remarkPlugins: [
+        [remarkCodeHike, { autoImport: false, theme, showCopyButton: true }],
+      ],
       useDynamicImport: true,
     },
   });

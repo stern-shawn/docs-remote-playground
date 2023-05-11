@@ -105,3 +105,11 @@ a {
     color-scheme: dark;
   }
 }
+
+.ch-codeblock .ch-code-button {
+  display: none;
+}
+
+.ch-codeblock:hover .ch-code-button {
+  display: block;
+}
