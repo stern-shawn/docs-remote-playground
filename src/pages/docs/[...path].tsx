@@ -10,12 +10,17 @@ import { getAllPaths } from '@/util/getPaths';
 import Link from 'next/link';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import { MDXComponents } from 'mdx/types';
 
-// TODO: refactor elsewhere, types, etc
-const components = {
+const components: MDXComponents = {
   CH,
-  // Replace anchor tags w/ Nextjs Links to get pre-fetch on hover, etc
-  a: (props: any) => <Link {...props} />,
+  //* Replace anchor tags w/ Nextjs Links to get pre-fetch on hover, etc
+  //! TS generates an error re legacy ref usage, destructure and avoid using the ref prop
+  a: ({ children, href, ref: _legacyRef, ...props }) => (
+    <Link {...props} href={href ?? ''}>
+      {children}
+    </Link>
+  ),
 };
 
 export default function TestPage({
