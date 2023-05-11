@@ -29,7 +29,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const fsPaths = await getAllPaths(docsDirectory);
   const mdxRegEx = new RegExp(/\.mdx$/);
   const paths = fsPaths.reduce<string[][]>((acc, currPath) => {
-    if (mdxRegEx.test(currPath)) {
+    if (path.extname(currPath) === '.mdx') {
       acc.push(
         currPath
           .replace(mdxRegEx, '')
