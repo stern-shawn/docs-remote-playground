@@ -16,6 +16,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
+        <Link href={'/docs/sms/send-messages'}>We&apos;ve got SMS</Link>
         <Link href={'/docs/serverless/functions-assets/overview'}>
           Go to some nested doc page
         </Link>
