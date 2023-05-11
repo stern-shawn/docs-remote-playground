@@ -1,0 +1,17 @@
+# Respond with a static message
+
+For the most basic possible example, one can reply to the incoming SMS with a hardcoded message. To do so, you can create a new MessagingResponse and declare the intended message contents. Once your message content has been set, you can return the generated TwiML by passing it to the callback function as shown and signaling a successful end to the Function.
+
+## Respond to an inbound SMS
+
+```js
+exports.handler = (context, event, callback) => {
+  // Create a new messaging response object
+  const twiml = new Twilio.twiml.MessagingResponse();
+  // Use any of the Node.js SDK methods, such as `message`, to compose a response
+  twiml.message('Hello, World!');
+  // Return the TwiML as the second argument to `callback`
+  // This will render the response as XML in reply to the webhook request
+  return callback(null, twiml);
+};
+```
