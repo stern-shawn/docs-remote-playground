@@ -8,6 +8,8 @@ import theme from 'shiki/themes/material-default.json';
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
 import { getAllPaths } from '@/util/getPaths';
 import Link from 'next/link';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 // TODO: refactor elsewhere, types, etc
 const components = {
@@ -94,6 +96,8 @@ export const getStaticProps: GetStaticProps<{
         [remarkCodeHike, { autoImport: false, theme, showCopyButton: true }],
       ],
       useDynamicImport: true,
+      // These work together to add IDs and linkify headings
+      rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
     },
   });
 
