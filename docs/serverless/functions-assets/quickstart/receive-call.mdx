@@ -1,0 +1,23 @@
+# Respond dynamically to an incoming phone call
+
+Because information about the incoming phone call is accessible from event object, it's also possible to tailor the response to the call based on that data. For example, you could respond with the city of the caller's phone number, or the number itself. The voice used to respond can also be modified, and pre-recorded audio can be used and/or added as well.
+
+Read the in-depth `<Say>` documentation for more details about how to configure your response.
+
+```js
+exports.handler = (context, event, callback) => {
+  // Create a new voice response object
+  const twiml = new Twilio.twiml.VoiceResponse();
+  // Webhook information is accessible as properties of the `event` object
+  const city = event.FromCity;
+  const number = event.From;
+
+  // You can optionally edit the voice used, template variables into your
+  // response, play recorded audio, and more
+  twiml.say({ voice: 'alice' }, `Never gonna give you up, ${city || number}`);
+  twiml.play('https://demo.twilio.com/docs/classic.mp3');
+  // Return the TwiML as the second argument to `callback`
+  // This will render the response as XML in reply to the webhook request
+  return callback(null, twiml);
+};
+```

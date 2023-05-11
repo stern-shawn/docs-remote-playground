@@ -1,29 +1,56 @@
 import { readFile } from 'node:fs/promises';
 import path from 'path';
 import { serialize } from 'next-mdx-remote/serialize';
-import { MDXRemote } from 'next-mdx-remote';
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { remarkCodeHike } from '@code-hike/mdx';
 import { CH } from '@code-hike/mdx/components';
 import theme from 'shiki/themes/material-default.json';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
+import { getAllPaths } from '@/util/getPaths';
+import Link from 'next/link';
 
-const components = { CH };
+// TODO: refactor elsewhere, types, etc
+const components = {
+  CH,
+  // Replace anchor tags w/ Nextjs Links to get pre-fetch on hover, etc
+  a: (props: any) => <Link {...props} />,
+};
 
 export default function TestPage({
   source,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  return (
-    <div className="wrapper">
-      <MDXRemote {...source} components={components} />
-    </div>
-  );
+}: InferGetStaticPropsType<typeof getStaticProps>) {
+  return <MDXRemote {...source} components={components} />;
 }
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const docsDirectory = path.resolve(process.cwd(), 'docs');
+  const fsPaths = await getAllPaths(docsDirectory);
+  const paths = fsPaths.map((p) => {
+    return p
+      .replace(/\.mdx$/, '')
+      .replace(`${docsDirectory}/`, '')
+      .split('/');
+  });
+
+  return {
+    paths: paths.map((path) => ({
+      params: { path },
+    })),
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps<{
+  source: MDXRemoteSerializeResult<
+    Record<string, unknown>,
+    Record<string, unknown>
+  >;
+}> = async (context) => {
   const requestedPath = context.params?.path;
   if (!requestedPath) return { notFound: true };
+
+  //? For demonstration purposes, this is grabbing the docs directory from the
+  // local filesystem. This can be replaced by an API call, db, etc
 
   const filePath = Array.isArray(requestedPath)
     ? path.resolve(process.cwd(), 'docs', ...requestedPath)
@@ -32,8 +59,6 @@ export const getServerSideProps = async (
   const markdown = await readFile(`${filePath}.mdx`, {
     encoding: 'utf-8',
   }).catch(async (error) => {
-    console.error({ context: 'page generation', error, filePath });
-
     // If the file wasn't found, the user is possibly requesting an 'index' page
     // for a given route. Check for an index.mdx file before completely deciding
     // that this is an error or 404
@@ -51,6 +76,7 @@ export const getServerSideProps = async (
       });
     }
 
+    console.error({ context: 'page generation', error, filePath });
     return undefined;
   });
 
@@ -65,5 +91,7 @@ export const getServerSideProps = async (
     },
   });
 
-  return { props: { source: mdxSource } };
+  // TODO: Check if there's a way to do github webhook + on-demand revalidation:
+  // https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration#on-demand-revalidation
+  return { props: { source: mdxSource }, revalidate: 60 };
 };
