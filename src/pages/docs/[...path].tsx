@@ -1,16 +1,16 @@
-import { readFile } from 'node:fs/promises';
-import path from 'path';
-import { serialize } from 'next-mdx-remote/serialize';
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { getAllPaths } from '@/util/getPaths';
 import { remarkCodeHike } from '@code-hike/mdx';
 import { CH } from '@code-hike/mdx/components';
-import theme from 'shiki/themes/material-default.json';
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
-import { getAllPaths } from '@/util/getPaths';
-import Link from 'next/link';
-import rehypeSlug from 'rehype-slug';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { MDXComponents } from 'mdx/types';
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
+import Link from 'next/link';
+import { readFile } from 'node:fs/promises';
+import path from 'path';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSlug from 'rehype-slug';
+import theme from 'shiki/themes/material-default.json';
 
 const components: MDXComponents = {
   CH,

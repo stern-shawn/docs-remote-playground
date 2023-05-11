@@ -22,5 +22,8 @@
     "rehype-autolink-headings": "^6.1.1",
     "rehype-slug": "^5.1.0",
     "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "prettier-plugin-organize-imports": "^3.2.2"
   }
 }
