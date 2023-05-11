@@ -101,7 +101,7 @@ export const getStaticProps: GetStaticProps<{
       remarkPlugins: [
         [remarkCodeHike, { autoImport: false, theme, showCopyButton: true }],
         // generates a table of contents based on headings
-        remarkToc,
+        [remarkToc, { tight: true }],
       ],
       useDynamicImport: true,
       // These work together to add IDs and linkify headings
