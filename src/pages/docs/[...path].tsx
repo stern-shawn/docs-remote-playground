@@ -42,12 +42,8 @@ const components: MDXComponents = {
   h1: ({ className, ref: _legacyRef, ...props }) => {
     return <Heading as="h1" variant="heading10" {...props} />;
   },
-  h2: ({ children, className, ref: _legacyRef, ...props }) => {
-    return (
-      <Heading as="h2" variant="heading20" {...props}>
-        {children}
-      </Heading>
-    );
+  h2: ({ className, ref: _legacyRef, ...props }) => {
+    return <Heading as="h2" variant="heading20" {...props} />;
   },
   h3: ({ className, ref: _legacyRef, ...props }) => {
     return <Heading as="h3" variant="heading30" {...props} />;
