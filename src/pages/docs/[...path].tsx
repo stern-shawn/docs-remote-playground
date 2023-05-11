@@ -10,6 +10,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'path';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
+import remarkToc from 'remark-toc';
 import theme from 'shiki/themes/material-default.json';
 
 const components: MDXComponents = {
@@ -99,6 +100,8 @@ export const getStaticProps: GetStaticProps<{
     mdxOptions: {
       remarkPlugins: [
         [remarkCodeHike, { autoImport: false, theme, showCopyButton: true }],
+        // generates a table of contents based on headings
+        remarkToc,
       ],
       useDynamicImport: true,
       // These work together to add IDs and linkify headings
