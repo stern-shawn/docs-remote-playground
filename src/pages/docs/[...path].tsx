@@ -1,5 +1,5 @@
+import { mdxSerializeConfig } from '@/lib/configs';
 import { getAllPaths } from '@/util/getPaths';
-import { remarkCodeHike } from '@code-hike/mdx';
 import { CH } from '@code-hike/mdx/components';
 import { Anchor, isExternalUrl } from '@twilio-paste/anchor';
 import { Box } from '@twilio-paste/box';
@@ -18,10 +18,6 @@ import Link from 'next/link';
 import { readFile } from 'node:fs/promises';
 import path from 'path';
 import { ReactNode } from 'react';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-import rehypeSlug from 'rehype-slug';
-import remarkToc from 'remark-toc';
-import theme from 'shiki/themes/material-default.json';
 
 const components: MDXComponents = {
   CH,
@@ -165,18 +161,7 @@ export const getStaticProps: GetStaticProps<{
     return { notFound: true };
   }
 
-  const mdxSource = await serialize(markdown, {
-    mdxOptions: {
-      remarkPlugins: [
-        [remarkCodeHike, { autoImport: false, theme, showCopyButton: true }],
-        // generates a table of contents based on headings
-        [remarkToc, { tight: true }],
-      ],
-      useDynamicImport: true,
-      // These work together to add IDs and linkify headings
-      rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
-    },
-  });
+  const mdxSource = await serialize(markdown, mdxSerializeConfig);
 
   // TODO: Check if there's a way to do github webhook + on-demand revalidation:
   // https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration#on-demand-revalidation
