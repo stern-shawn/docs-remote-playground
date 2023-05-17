@@ -204,7 +204,7 @@ export const getStaticProps: GetStaticProps<{
   }
 
   const mdxSource = await serialize(markdown, mdxSerializeConfig);
-  console.log({ compiledSource: mdxSource.compiledSource });
+
   // TODO: Check if there's a way to do github webhook + on-demand revalidation:
   // https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration#on-demand-revalidation
   return { props: { source: mdxSource }, revalidate: 60 };

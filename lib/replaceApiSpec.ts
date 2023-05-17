@@ -1,137 +1,53 @@
 import { valueToEstree } from 'estree-util-value-to-estree';
 import { readFileSync } from 'fs';
-import { Content, Parent } from 'mdast';
+import type { Code, Parent } from 'mdast';
 import { MdxJsxFlowElement } from 'mdast-util-mdx-jsx';
 import * as nodePath from 'path';
+import type { Node } from 'unist';
 import { visit } from 'unist-util-visit';
 
-interface OpenApiSpec {
-  paths: {
-    [path: string]: {
-      [method: string]: {
-        description?: string;
-        parameters?: {
-          name: string;
-          in: string;
-          description?: string;
-          schema: { type: string; format?: string };
-          required?: boolean;
-          [key: string]: any;
-        }[];
-        responses?: {
-          [code: string]: {
-            description?: string;
-            content?: {
-              [contentType: string]: {
-                schema: { $ref?: string; type?: string };
-                [key: string]: any;
-              };
-            };
-            [key: string]: any;
-          };
-        };
-        security?: { [name: string]: any }[];
-        requestBody?: {
-          content: {
-            [contentType: string]: {
-              schema: { $ref?: string; type?: string };
-              [key: string]: any;
-            };
-          };
-          [key: string]: any;
-        };
-        [key: string]: any;
-      };
-    };
-  };
-}
-
-interface ExtractedApiSpec {
-  type: string;
-  path: string;
-  method: string;
-  description?: string;
-  parameters: {
-    name: string;
-    in: string;
-    description?: string;
-    schema: { type: string; format?: string };
-    required?: boolean;
-    [key: string]: any;
-  }[];
-  responses: {
-    [code: string]: {
-      description?: string;
-      content?: {
-        [contentType: string]: {
-          schema: { $ref?: string; type?: string };
-          [key: string]: any;
-        };
-      };
-      [key: string]: any;
-    };
-  };
-  security: { [name: string]: any }[];
-  requestBody: {
-    content: {
-      [contentType: string]: {
-        schema: { $ref?: string; type?: string };
-        [key: string]: any;
-      };
-    };
-    [key: string]: any;
-  } | null;
-}
-
-export function replaceApiSpec() {
-  return function doIt(tree: any) {
-    // console.log('Look at me, Im working!');
-    // console.log('tree', tree);
-    visit(tree, 'paragraph', (node: Parent, index, parent: Parent) => {
-      console.log('node: ', node);
-      console.log('index: ', index);
-      // console.log('parent: ', parent);
-      if (!(node.children.length === 1 && node.children[0].type === 'text')) {
-        console.log('early return node', node);
-        return;
-      }
-
-      const codeNode = node.children[0];
-      const codeContent = codeNode.value.trim();
-
-      if (!codeContent.startsWith(':::automatic-api-spec')) {
+export function remarkOpenApiSpecs() {
+  return function transformApiSpecs(tree: Node) {
+    visit(tree, 'code', (node: Code, index, parent: Parent) => {
+      if (
+        !(
+          node.type === 'code' &&
+          node.lang === 'automatic-api-spec' &&
+          typeof index === 'number'
+        )
+      ) {
+        //?  early return, node isn't a spec block to modify
         return;
       }
 
       console.log('Okay, actually processing something!', node);
 
-      const specContent = codeContent
-        .replace(':::automatic-api-spec', '')
-        .trim();
-      console.log('specContent: ', specContent);
-      const specLines = specContent.split('\n');
-      console.log('specLines: ', specLines);
-      const [specName, path, method] = specLines[0].split(' ');
-      console.log('specName: ', specName);
-      console.log('path: ', path);
-      console.log('method: ', method);
+      const [specName, path, method] = node.value.split(' ');
 
+      //? Abstraction, could be an API call to GH at some point
+      // ideally, maybe initially grab and merge all specs into memory prior to mdx parsing so we
+      // only have a single read/parse step instead of per-mdx
       const spec = JSON.parse(
         readFileSync(
           nodePath.resolve(process.cwd(), 'openapi', `${specName}.json`),
           'utf-8'
         )
       );
-      console.log('spec: ', spec);
 
       const pathData = spec.paths[path];
-      console.log('pathData: ', pathData);
 
-      const { servers = [], description = '' } = pathData;
-      console.log('servers: ', servers);
-      console.log('description: ', description);
+      const {
+        servers = [],
+        description = '',
+        'x-twilio': xTwilio = {},
+        // Not sure if we can assume all remaining properties are methods, but could potentially
+        // expand autogeneration by doing methods.map((method) => pathData[method]...) instead of
+        // using the single method provided in the markdown
+        ...methods
+      } = pathData;
+
       const methodDetails = pathData[method.toLowerCase()];
-      console.log('methodDetails: ', methodDetails);
+
       const {
         parameters = [],
         responses = {},
@@ -140,6 +56,7 @@ export function replaceApiSpec() {
         operationId = '',
       } = methodDetails;
 
+      // Thank you, D.Pro 🚀
       const apiSpec: MdxJsxFlowElement = {
         type: 'mdxJsxFlowElement',
         name: 'ApiSpec',
@@ -263,10 +180,8 @@ export function replaceApiSpec() {
         ],
       };
 
-      console.log('apiSpec', apiSpec);
-
       // Replace the original node with the extracted data
-      parent.children[index as number] = apiSpec as Content;
+      parent.children[index] = apiSpec;
     });
   };
 }
