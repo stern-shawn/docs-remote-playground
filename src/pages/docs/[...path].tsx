@@ -87,7 +87,7 @@ const components: MDXComponents = {
   code: ({ children }) => {
     return <InlineCode>{children as string}</InlineCode>;
   },
-  apiSpec: ({
+  ApiSpec: ({
     path,
     method,
     description,
@@ -95,6 +95,7 @@ const components: MDXComponents = {
     responses,
     security,
     requestBody,
+    operationId,
   }) => {
     return (
       <div>
@@ -104,23 +105,25 @@ const components: MDXComponents = {
         <p>{description}</p>
 
         <h4>Parameters:</h4>
-        {parameters.map((param: any) => (
-          <div key={param.name}>
-            <p>Name: {param.name}</p>
-            <p>In: {param.in}</p>
-            <p>Description: {param.description}</p>
-            {/* Render additional parameter details as needed */}
-          </div>
-        ))}
 
         <h4>Responses:</h4>
-        {Object.entries(responses).map(([code, response]) => (
-          <div key={code}>
-            <p>Code: {code}</p>
-            <p>Description: {(response as any).description}</p>
-            {/* Render additional response details as needed */}
-          </div>
-        ))}
+
+        <pre>
+          {JSON.stringify(
+            {
+              path,
+              method,
+              description,
+              parameters,
+              responses,
+              security,
+              requestBody,
+              operationId,
+            },
+            null,
+            2
+          )}
+        </pre>
 
         {/* Render additional sections (e.g., security, requestBody) as needed */}
       </div>
@@ -201,7 +204,7 @@ export const getStaticProps: GetStaticProps<{
   }
 
   const mdxSource = await serialize(markdown, mdxSerializeConfig);
-
+  console.log({ compiledSource: mdxSource.compiledSource });
   // TODO: Check if there's a way to do github webhook + on-demand revalidation:
   // https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration#on-demand-revalidation
   return { props: { source: mdxSource }, revalidate: 60 };

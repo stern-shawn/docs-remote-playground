@@ -1,4 +1,7 @@
+import { valueToEstree } from 'estree-util-value-to-estree';
 import { readFileSync } from 'fs';
+import { Content, Parent } from 'mdast';
+import { MdxJsxFlowElement } from 'mdast-util-mdx-jsx';
 import * as nodePath from 'path';
 import { visit } from 'unist-util-visit';
 
@@ -82,9 +85,9 @@ interface ExtractedApiSpec {
 
 export function replaceApiSpec() {
   return function doIt(tree: any) {
-    console.log('Look at me, Im working!');
-    console.log('tree', tree);
-    visit(tree, 'paragraph', (node, index, parent) => {
+    // console.log('Look at me, Im working!');
+    // console.log('tree', tree);
+    visit(tree, 'paragraph', (node: Parent, index, parent: Parent) => {
       console.log('node: ', node);
       console.log('index: ', index);
       // console.log('parent: ', parent);
@@ -137,20 +140,133 @@ export function replaceApiSpec() {
         operationId = '',
       } = methodDetails;
 
-      const apiSpec = {
-        type: 'apiSpec',
-        path,
-        method,
-        description,
-        parameters,
-        responses,
-        security,
-        requestBody,
-        operationId,
+      const apiSpec: MdxJsxFlowElement = {
+        type: 'mdxJsxFlowElement',
+        name: 'ApiSpec',
+        children: [],
+        attributes: [
+          {
+            type: 'mdxJsxAttribute',
+            name: 'path',
+            value: path,
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'method',
+            value: method,
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'parameters',
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              data: {
+                estree: {
+                  type: 'Program',
+                  body: [
+                    {
+                      type: 'ExpressionStatement',
+                      expression: valueToEstree(parameters),
+                    },
+                  ],
+                  sourceType: 'module',
+                },
+              },
+            },
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'responses',
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              data: {
+                estree: {
+                  type: 'Program',
+                  body: [
+                    {
+                      type: 'ExpressionStatement',
+                      expression: valueToEstree(responses),
+                    },
+                  ],
+                  sourceType: 'module',
+                },
+              },
+            },
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'security',
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              data: {
+                estree: {
+                  type: 'Program',
+                  body: [
+                    {
+                      type: 'ExpressionStatement',
+                      expression: valueToEstree(security),
+                    },
+                  ],
+                  sourceType: 'module',
+                },
+              },
+            },
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'requestBody',
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              data: {
+                estree: {
+                  type: 'Program',
+                  body: [
+                    {
+                      type: 'ExpressionStatement',
+                      expression: valueToEstree(requestBody),
+                    },
+                  ],
+                  sourceType: 'module',
+                },
+              },
+            },
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'operationId',
+            value: operationId,
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'servers',
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              data: {
+                estree: {
+                  type: 'Program',
+                  body: [
+                    {
+                      type: 'ExpressionStatement',
+                      expression: valueToEstree(servers),
+                    },
+                  ],
+                  sourceType: 'module',
+                },
+              },
+            },
+          },
+          {
+            type: 'mdxJsxAttribute',
+            name: 'description',
+            value: description,
+          },
+        ],
       };
 
+      console.log('apiSpec', apiSpec);
+
       // Replace the original node with the extracted data
-      parent.children.splice(index, 1, apiSpec);
+      parent.children[index as number] = apiSpec as Content;
     });
   };
 }
