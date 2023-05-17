@@ -87,6 +87,45 @@ const components: MDXComponents = {
   code: ({ children }) => {
     return <InlineCode>{children as string}</InlineCode>;
   },
+  apiSpec: ({
+    path,
+    method,
+    description,
+    parameters,
+    responses,
+    security,
+    requestBody,
+  }) => {
+    return (
+      <div>
+        <h3>
+          {method} {path}
+        </h3>
+        <p>{description}</p>
+
+        <h4>Parameters:</h4>
+        {parameters.map((param: any) => (
+          <div key={param.name}>
+            <p>Name: {param.name}</p>
+            <p>In: {param.in}</p>
+            <p>Description: {param.description}</p>
+            {/* Render additional parameter details as needed */}
+          </div>
+        ))}
+
+        <h4>Responses:</h4>
+        {Object.entries(responses).map(([code, response]) => (
+          <div key={code}>
+            <p>Code: {code}</p>
+            <p>Description: {(response as any).description}</p>
+            {/* Render additional response details as needed */}
+          </div>
+        ))}
+
+        {/* Render additional sections (e.g., security, requestBody) as needed */}
+      </div>
+    );
+  },
 };
 
 export default function TestPage({
