@@ -12,11 +12,16 @@
     "@code-hike/mdx": "^0.8.3",
     "@twilio-paste/core": "^19.1.0",
     "@twilio-paste/icons": "^11.0.0",
+    "@types/mdast": "^3.0.11",
     "@types/node": "20.1.2",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
+    "@types/unist": "^2.0.6",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
+    "estree-util-value-to-estree": "^3.0.1",
+    "js-yaml": "^4.1.0",
+    "mdast-util-mdx-jsx": "^2.1.3",
     "next": "13.4.1",
     "next-mdx-remote": "^4.4.1",
     "react": "18.2.0",
@@ -24,7 +29,8 @@
     "rehype-autolink-headings": "^6.1.1",
     "rehype-slug": "^5.1.0",
     "remark-toc": "^8.0.1",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "prettier-plugin-organize-imports": "^3.2.2"
