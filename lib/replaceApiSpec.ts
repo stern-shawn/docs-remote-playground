@@ -1,10 +1,29 @@
 import { valueToEstree } from 'estree-util-value-to-estree';
 import { readFileSync } from 'fs';
+import yaml from 'js-yaml';
 import type { Code, Parent } from 'mdast';
 import { MdxJsxFlowElement } from 'mdast-util-mdx-jsx';
 import * as nodePath from 'path';
 import type { Node } from 'unist';
 import { visit } from 'unist-util-visit';
+import { z } from 'zod';
+
+const SpecConfigSchema = z.object({
+  specName: z.string({
+    required_error:
+      'Please provide a proper specName for your endpoint, such as twilio_messaging_v1',
+  }),
+  path: z.string({
+    required_error:
+      'Please provide a correct path, such as /2010-04-01/Accounts/{Sid}',
+  }),
+  method: z.string({
+    required_error:
+      'Please provide one HTTP method that you need documentation for (GET, POST, etc)',
+  }),
+});
+
+type SpecConfig = z.infer<typeof SpecConfigSchema>;
 
 export function remarkOpenApiSpecs() {
   return function transformApiSpecs(tree: Node) {
@@ -20,9 +39,8 @@ export function remarkOpenApiSpecs() {
         return;
       }
 
-      console.log('Okay, actually processing something!', node);
-
-      const [specName, path, method] = node.value.split(' ');
+      const config = SpecConfigSchema.parse(yaml.load(node.value));
+      const { specName, path, method } = config;
 
       //? Abstraction, could be an API call to GH at some point
       // ideally, maybe initially grab and merge all specs into memory prior to mdx parsing so we
