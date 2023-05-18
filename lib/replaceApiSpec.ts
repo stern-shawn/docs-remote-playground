@@ -8,7 +8,7 @@ import { visit } from 'unist-util-visit';
 
 export function remarkOpenApiSpecs() {
   return function transformApiSpecs(tree: Node) {
-    visit(tree, 'code', (node: Code, index, parent: Parent) => {
+    visit(tree, 'code', (node: Code, index: number | null, parent: Parent) => {
       if (
         !(
           node.type === 'code' &&
@@ -57,6 +57,8 @@ export function remarkOpenApiSpecs() {
       } = methodDetails;
 
       // Thank you, D.Pro 🚀
+      // TODO: inject code snippets from yoyodyne/holodeck/??? as well so that they
+      // can be picked up by code-hike or other subsequent plugins
       const apiSpec: MdxJsxFlowElement = {
         type: 'mdxJsxFlowElement',
         name: 'ApiSpec',
