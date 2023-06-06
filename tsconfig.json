@@ -16,6 +16,7 @@
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@/components/*": ["./components/*"],
       "@/lib/*": ["./lib/*"],
       "@/util/*": ["./util/*"]
     }
